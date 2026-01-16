@@ -153,6 +153,6 @@ class NortalScraper:
         logging.info(f"Scraping complete. Saved {len(self.data)} pages to {output_path}")
 
 if __name__ == "__main__":
-    # Test run
-    scraper = NortalScraper(max_pages=3, max_depth=1)
+    # Production run with more comprehensive scraping
+    scraper = NortalScraper(max_pages=50, max_depth=2)
     scraper.scrape()

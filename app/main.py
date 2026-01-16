@@ -2,11 +2,49 @@
 import streamlit as st
 import os
 from rag import get_qa_chain
+from scraper import NortalScraper
+from ingest import ingest_data
 
 st.set_page_config(page_title="Nortal Intelligence", page_icon="🤖")
 
 st.title("Nortal Intelligence 🤖")
 st.markdown("Ask questions about Nortal's services, expertise, and global presence.")
+
+# Check if data exists, if not offer to initialize
+if not os.path.exists("data/chroma_db"):
+    st.warning("⚠️ Vector database not initialized. This app needs to scrape and index data first.")
+    
+    st.markdown("""
+    ### First-Time Setup Required
+    
+    This app needs to:
+    1. Scrape nortal.com (takes ~15 seconds for 3 pages)
+    2. Create embeddings and build the vector database (takes ~10 seconds)
+    
+    **Note:** You need to set your `OPENAI_API_KEY` in Streamlit Secrets for this to work.
+    """)
+    
+    if st.button("🚀 Initialize Database (One-time setup)"):
+        with st.spinner("Step 1/2: Scraping nortal.com..."):
+            try:
+                scraper = NortalScraper(max_pages=3, max_depth=1)
+                scraper.scrape()
+                st.success("✅ Scraping complete!")
+            except Exception as e:
+                st.error(f"Scraping failed: {e}")
+                st.stop()
+        
+        with st.spinner("Step 2/2: Building vector database..."):
+            try:
+                ingest_data()
+                st.success("✅ Database initialized!")
+                st.info("Please refresh the page to start chatting.")
+                st.stop()
+            except Exception as e:
+                st.error(f"Ingestion failed: {e}")
+                st.stop()
+    
+    st.stop()
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -16,7 +54,8 @@ if "qa_func" not in st.session_state:
     try:
         st.session_state.qa_func = get_qa_chain()
     except Exception as e:
-        st.error(f"Failed to initialize RAG pipeline: {e}. Make sure data is ingested.")
+        st.error(f"Failed to initialize RAG pipeline: {e}")
+        st.info("Try reinitializing the database using the button above.")
         st.session_state.qa_func = None
 
 # Display chat messages from history on app rerun
@@ -51,4 +90,4 @@ if prompt := st.chat_input("What would you like to know?"):
                 except Exception as e:
                     st.error(f"Error generating response: {e}")
     else:
-        st.error("RAG pipeline is not ready. Please check if data is ingested.")
+        st.error("RAG pipeline is not ready. Please reinitialize the database.")
