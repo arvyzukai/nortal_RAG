@@ -1,0 +1,10 @@
+langchain
+langchain-community
+langchain-openai
+langchain-chroma
+selenium
+webdriver-manager
+streamlit
+bs4
+python-dotenv
+tiktoken
