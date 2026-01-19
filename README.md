@@ -58,9 +58,20 @@ docker-compose up --build
 - **FastAPI Backend:** [http://localhost:8000](http://localhost:8000)
 - **Selenium Standalone:** Handles JavaScript rendering for the scraper.
 
-**Verify API Health:**
+## 🧪 Verification & Testing
+
+### 1. API Health Check
 ```bash
 curl http://localhost:8000/health
+```
+
+### 2. Run Automated Tests
+All tests are located in the `tests/` directory and use `pytest`.
+
+Ensure the API server is running (`uvicorn app.api:app`), then run:
+```bash
+# Using the virtual environment
+.venv\Scripts\python.exe -m pytest tests/
 ```
 
 ---
@@ -144,8 +155,7 @@ nortal_rag/
 ├── data/
 │   ├── scraped_data.json   # Scraped content cache
 │   └── chroma_db/          # Vector store persistence
-├── tests/                  # API and integration tests
-├── verify_api.py           # Quick API verification script
+├── tests/                  # API and RAG integration tests (pytest)
 ├── .env                    # API keys (not committed)
 ├── .gitignore
 ├── requirements.txt
