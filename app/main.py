@@ -18,21 +18,39 @@ st.markdown("Ask questions about Nortal's services, expertise, and global presen
 
 # Check if data exists, if not offer to initialize
 if not os.path.exists("data/chroma_db"):
-    st.warning("⚠️ Vector database not initialized. This app needs to scrape and index data first.")
+    st.warning("⚠️ Vector database not initialized. The app needs data to answer questions.")
+    
+    # Check if we have pre-existing data
+    has_local_data = os.path.exists("data/scraped_data.json")
+    
+    if has_local_data:
+        st.info("📂 Found 'scraped_data.json' locally. You can initialize the database using this existing data.")
+        if st.button("🚀 Initialize from Existing Data (Fast)"):
+            with st.spinner("Building vector database from 'scraped_data.json'..."):
+                try:
+                    ingest_data()
+                    st.success("✅ Database initialized from local data!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Ingestion failed: {e}")
+                    st.stop()
+    
+    st.markdown("---")
+    st.markdown("### Or start from scratch")
+    st.markdown("If you want fresh data, you can scrape the website again.")
     
     st.markdown("""
-    ### First-Time Setup Required
-    
-    This app needs to:
+    **Setup Steps:**
     1. Scrape nortal.com (takes ~15 seconds for 3 pages)
     2. Create embeddings and build the vector database (takes ~10 seconds)
     
     **Note:** You need to set your `OPENAI_API_KEY` in Streamlit Secrets for this to work.
     """)
     
-    if st.button("🚀 Initialize Database (One-time setup)"):
+    if st.button("🔄 Scrape & Initialize (Full Setup)"):
         with st.spinner("Step 1/2: Scraping nortal.com..."):
             try:
+                # Use robust scraping settings
                 scraper = NortalScraper(max_pages=3, max_depth=1)
                 scraper.scrape()
                 st.success("✅ Scraping complete!")
@@ -44,8 +62,7 @@ if not os.path.exists("data/chroma_db"):
             try:
                 ingest_data()
                 st.success("✅ Database initialized!")
-                st.info("Please refresh the page to start chatting.")
-                st.stop()
+                st.experimental_rerun()
             except Exception as e:
                 st.error(f"Ingestion failed: {e}")
                 st.stop()
