@@ -1,11 +1,22 @@
-
-version: '3.8'
-
 services:
-  app:
+  streamlit:
     build: .
+    command: [ "streamlit", "run", "app/main.py", "--server.address=0.0.0.0" ]
     ports:
       - "8501:8501"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SELENIUM_URL=http://selenium:4444/wd/hub
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - selenium
+
+  api:
+    build: .
+    command: [ "uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000" ]
+    ports:
+      - "8000:8000"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - SELENIUM_URL=http://selenium:4444/wd/hub

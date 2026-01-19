@@ -20,4 +20,5 @@ RUN mkdir -p data
 EXPOSE 8501
 
 # Command to run the app
-CMD ["streamlit", "run", "app/main.py", "--server.address=0.0.0.0"]
+# Command to run the app (will be overridden in docker-compose)
+# CMD ["streamlit", "run", "app/main.py", "--server.address=0.0.0.0"]
