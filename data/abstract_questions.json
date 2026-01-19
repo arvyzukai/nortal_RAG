@@ -1,0 +1,26 @@
+[
+    {
+        "question": "What is the main goal of the Nortal AI Hackathon?",
+        "reference_answer": "The Nortal AI Hack is a 48-hour sprint where teams and global AI talent tackle business challenges to create a working AI solution/MVP."
+    },
+    {
+        "question": "Describe Nortal's company culture.",
+        "reference_answer": "Nortal values impact, teamwork, and continuous learning. It highlights a culture of growth and meaningful work, where they attack mission-critical challenges."
+    },
+    {
+        "question": "How does X-Road ensure data sovereignty?",
+        "reference_answer": "X-Road ensures data sovereignty through a decentralized architecture where organizations retain full control over their data. It uses security servers, end-to-end encryption, and allows data transfer directly between provider and consumer without central intermediaries."
+    },
+    {
+        "question": "What is 'Personal Government' according to Nortal?",
+        "reference_answer": "Personal Government is the next step in digital services where public services become citizen-centric, personalized, equitable, and fully sustainable. It implies proactive services that don't require citizens to navigate bureaucracy."
+    },
+    {
+        "question": "How does Nortal contribute to the Defence sector?",
+        "reference_answer": "Nortal empowers Armed Forces and Defence Ministries through digital transformation, data exploitation, and cyber force protection. They focus on resilience, secure architecture, and decision advantage."
+    },
+    {
+        "question": "Explain the concept of 'System-level efficiency' in government.",
+        "reference_answer": "System-level efficiency measures performance not just by speed or cost, but by how well digital systems reinforce trust, capacity, and adaptability across government. It involves operational performance, state capacity, and public trust advancing together."
+    }
+]

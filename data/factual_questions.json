@@ -1,0 +1,42 @@
+[
+    {
+        "question": "How many offices does Nortal have worldwide?",
+        "expected_answer": "30",
+        "match_type": "contains"
+    },
+    {
+        "question": "How many experts does Nortal have?",
+        "expected_answer": "2700",
+        "match_type": "contains"
+    },
+    {
+        "question": "When was Nortal founded?",
+        "expected_answer": "25 years ago",
+        "match_type": "contains"
+    },
+    {
+        "question": "Which company did Nortal acquire in 2024?",
+        "expected_answer": "3DOT",
+        "match_type": "contains"
+    },
+    {
+        "question": "In which year did Nortal acquire Dev9?",
+        "expected_answer": "2018",
+        "match_type": "contains"
+    },
+    {
+        "question": "What is the name of the data exchange layer Estonia uses?",
+        "expected_answer": "X-Road",
+        "match_type": "contains"
+    },
+    {
+        "question": "Who is the founder and CEO of Nortal?",
+        "expected_answer": "Priit Alamäe",
+        "match_type": "contains"
+    },
+    {
+        "question": "In what year did Nortal establish a delivery centre in Serbia?",
+        "expected_answer": "2006",
+        "match_type": "contains"
+    }
+]
