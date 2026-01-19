@@ -147,20 +147,22 @@ This ensures the vector DB only indexes meaningful content, not boilerplate HTML
 nortal_rag/
 ├── app/
 │   ├── __init__.py         # Package marker
-│   ├── scraper.py          # Selenium scraper with BFS
-│   ├── ingest.py           # Vector DB indexing
-│   ├── rag.py              # LangChain retrieval chain
 │   ├── api.py              # FastAPI backend endpoints
-│   └── main.py             # Streamlit UI
+│   ├── ingest.py           # Vector DB indexing
+│   ├── main.py             # Streamlit UI
+│   ├── rag.py              # LangChain retrieval chain
+│   └── scraper.py          # Selenium scraper with BFS
 ├── data/
-│   ├── scraped_data.json   # Scraped content cache
-│   └── chroma_db/          # Vector store persistence
+│   ├── chroma_db/          # Vector store persistence
+│   └── scraped_data.json   # Scraped content cache
 ├── tests/                  # API and RAG integration tests (pytest)
-├── .env                    # API keys (not committed)
+│   ├── test_api.py         # FastAPI endpoint tests
+│   └── test_rag.py         # RAG pipeline integration tests
+├── .env.example            # Environment template
 ├── .gitignore
-├── requirements.txt
 ├── Dockerfile
 ├── docker-compose.yml
+├── requirements.txt
 └── README.md
 ```
 
@@ -168,8 +170,8 @@ nortal_rag/
 
 ## 🔍 How It Works
 
-1. **Scraping:** `scraper.py` visits nortal.com, extracts clean text using BeautifulSoup, and saves to JSON.
-2. **Indexing:** `ingest.py` splits text into chunks, generates embeddings via OpenAI, and stores in ChromaDB.
+1. **Scraping:** `app/scraper.py` visits nortal.com, extracts clean text using BeautifulSoup, and saves to JSON.
+2. **Indexing:** `app/ingest.py` splits text into chunks, generates embeddings via OpenAI, and stores in ChromaDB.
 3. **Retrieval:** When a user asks a question:
    - The query is embedded
    - Top-3 most similar chunks are retrieved from ChromaDB
@@ -204,13 +206,13 @@ Key design decisions were made to prioritize **simplicity**, **maintainability**
 
 ## 🔧 Configuration
 
-### Scraper Parameters (in `scraper.py`)
+### Scraper Parameters (in `app/scraper.py`)
 ```python
 max_pages=10    # Total pages to scrape
 max_depth=2     # BFS depth limit
 ```
 
-### RAG Parameters (in `rag.py`)
+### RAG Parameters (in `app/rag.py`)
 ```python
 search_kwargs={"k": 3}  # Number of documents to retrieve
 temperature=0           # Deterministic responses
