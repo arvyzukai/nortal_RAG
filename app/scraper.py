@@ -8,7 +8,7 @@ from urllib.parse import urlparse, urljoin
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+
 from bs4 import BeautifulSoup
 
 # Configure logging
@@ -40,9 +40,16 @@ class NortalScraper:
             logging.info("Starting local Selenium driver")
             chrome_options = Options()
             chrome_options.add_argument("--headless")
-            # Use webdriver_manager to automatically handle driver installation
-            service = Service(ChromeDriverManager().install())
-            self.driver = webdriver.Chrome(service=service, options=chrome_options)
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            chrome_options.add_argument("--disable-gpu")
+            
+            # Use native Selenium Manager (cleaner and more robust)
+            try:
+                self.driver = webdriver.Chrome(options=chrome_options)
+            except Exception as e:
+                logging.error(f"Failed to initialize local driver: {e}")
+                raise
 
     def is_valid_url(self, url):
         parsed = urlparse(url)
