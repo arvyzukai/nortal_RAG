@@ -13,7 +13,7 @@ load_dotenv()
 
 PERSIST_DIRECTORY = "data/chroma_db"
 
-def ingest_data(json_path="data/scraped_data.json"):
+def ingest_data(json_path="data/scraped_data.json", chunk_size=1000, chunk_overlap=200):
     if not os.path.exists(json_path):
         print(f"Error: {json_path} not found. Run scraper first.")
         return
@@ -34,12 +34,12 @@ def ingest_data(json_path="data/scraped_data.json"):
 
     # Split text
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
         length_function=len
     )
     chunks = text_splitter.split_documents(documents)
-    print(f"Split {len(documents)} documents into {len(chunks)} chunks.")
+    print(f"Split {len(documents)} documents into {len(chunks)} chunks (Size: {chunk_size}, Overlap: {chunk_overlap}).")
 
     # Create Embeddings
     embeddings = OpenAIEmbeddings()
@@ -57,4 +57,10 @@ def ingest_data(json_path="data/scraped_data.json"):
     print(f"Ingestion complete. Vector store saved to {PERSIST_DIRECTORY}")
 
 if __name__ == "__main__":
-    ingest_data()
+    import argparse
+    parser = argparse.ArgumentParser(description="Ingest data into RAG vector store.")
+    parser.add_argument("--chunk-size", type=int, default=1000, help="Size of text chunks")
+    parser.add_argument("--chunk-overlap", type=int, default=200, help="Overlap between chunks")
+    args = parser.parse_args()
+    
+    ingest_data(chunk_size=args.chunk_size, chunk_overlap=args.chunk_overlap)

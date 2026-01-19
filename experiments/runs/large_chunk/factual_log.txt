@@ -1,0 +1,65 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\orus\Desktop\CV\Nortal\nortal_rag
+plugins: anyio-4.12.1, langsmith-0.6.4
+collected 8 items
+
+tests\evaluation\test_factual.py .FF.....                                [100%]
+
+================================== FAILURES ===================================
+__________ test_factual_question[How many experts does Nortal have?] __________
+
+qa_chain = <function get_qa_chain.<locals>.qa_with_sources at 0x0000022A7E9CD580>
+question = FactualQuestion(question='How many experts does Nortal have?', expected_answer='2700', match_type='contains')
+
+    @pytest.mark.parametrize("question", QUESTIONS, ids=[q.question for q in QUESTIONS])
+    def test_factual_question(qa_chain, question: FactualQuestion):
+        """
+        Test a factual question against the RAG system.
+        """
+        result = qa_chain(question.question)
+        answer = result.get("answer", "")
+    
+        assert answer, "RAG returned empty answer"
+    
+        if question.match_type == "contains":
+>           assert question.expected_answer.lower() in answer.lower(), \
+E           AssertionError: Expected '2700' in answer: Nortal has over 200 Microsoft certified experts and 15+ Salesforce-certified experts.
+E           assert '2700' in 'nortal has over 200 microsoft certified experts and 15+ salesforce-certified experts.'
+E            +  where '2700' = <built-in method lower of str object at 0x0000022A7E341870>()
+E            +    where <built-in method lower of str object at 0x0000022A7E341870> = '2700'.lower
+E            +      where '2700' = FactualQuestion(question='How many experts does Nortal have?', expected_answer='2700', match_type='contains').expected_answer
+E            +  and   'nortal has over 200 microsoft certified experts and 15+ salesforce-certified experts.' = <built-in method lower of str object at 0x0000022A7E997240>()
+E            +    where <built-in method lower of str object at 0x0000022A7E997240> = 'Nortal has over 200 Microsoft certified experts and 15+ Salesforce-certified experts.'.lower
+
+tests\evaluation\test_factual.py:38: AssertionError
+_______________ test_factual_question[When was Nortal founded?] _______________
+
+qa_chain = <function get_qa_chain.<locals>.qa_with_sources at 0x0000022A7E9CD580>
+question = FactualQuestion(question='When was Nortal founded?', expected_answer='25 years ago', match_type='contains')
+
+    @pytest.mark.parametrize("question", QUESTIONS, ids=[q.question for q in QUESTIONS])
+    def test_factual_question(qa_chain, question: FactualQuestion):
+        """
+        Test a factual question against the RAG system.
+        """
+        result = qa_chain(question.question)
+        answer = result.get("answer", "")
+    
+        assert answer, "RAG returned empty answer"
+    
+        if question.match_type == "contains":
+>           assert question.expected_answer.lower() in answer.lower(), \
+E           AssertionError: Expected '25 years ago' in answer: Nortal was founded 20 years ago in the small city of Tartu.
+E           assert '25 years ago' in 'nortal was founded 20 years ago in the small city of tartu.'
+E            +  where '25 years ago' = <built-in method lower of str object at 0x0000022A7E342F30>()
+E            +    where <built-in method lower of str object at 0x0000022A7E342F30> = '25 years ago'.lower
+E            +      where '25 years ago' = FactualQuestion(question='When was Nortal founded?', expected_answer='25 years ago', match_type='contains').expected_answer
+E            +  and   'nortal was founded 20 years ago in the small city of tartu.' = <built-in method lower of str object at 0x0000022A7EB17360>()
+E            +    where <built-in method lower of str object at 0x0000022A7EB17360> = 'Nortal was founded 20 years ago in the small city of Tartu.'.lower
+
+tests\evaluation\test_factual.py:38: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/evaluation/test_factual.py::test_factual_question[How many experts does Nortal have?]
+FAILED tests/evaluation/test_factual.py::test_factual_question[When was Nortal founded?]
+======================== 2 failed, 6 passed in 11.80s =========================

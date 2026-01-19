@@ -1,0 +1,65 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.14, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\orus\Desktop\CV\Nortal\nortal_rag
+plugins: anyio-4.12.1, langsmith-0.6.4
+collected 8 items
+
+tests\evaluation\test_factual.py .F.F....                                [100%]
+
+================================== FAILURES ===================================
+__________ test_factual_question[How many experts does Nortal have?] __________
+
+qa_chain = <function get_qa_chain.<locals>.qa_with_sources at 0x00000278501056C0>
+question = FactualQuestion(question='How many experts does Nortal have?', expected_answer='2700', match_type='contains')
+
+    @pytest.mark.parametrize("question", QUESTIONS, ids=[q.question for q in QUESTIONS])
+    def test_factual_question(qa_chain, question: FactualQuestion):
+        """
+        Test a factual question against the RAG system.
+        """
+        result = qa_chain(question.question)
+        answer = result.get("answer", "")
+    
+        assert answer, "RAG returned empty answer"
+    
+        if question.match_type == "contains":
+>           assert question.expected_answer.lower() in answer.lower(), \
+E           AssertionError: Expected '2700' in answer: I don't know.
+E           assert '2700' in "i don't know."
+E            +  where '2700' = <built-in method lower of str object at 0x000002784FA72430>()
+E            +    where <built-in method lower of str object at 0x000002784FA72430> = '2700'.lower
+E            +      where '2700' = FactualQuestion(question='How many experts does Nortal have?', expected_answer='2700', match_type='contains').expected_answer
+E            +  and   "i don't know." = <built-in method lower of str object at 0x00000278508794F0>()
+E            +    where <built-in method lower of str object at 0x00000278508794F0> = "I don't know.".lower
+
+tests\evaluation\test_factual.py:38: AssertionError
+______ test_factual_question[Which company did Nortal acquire in 2024?] _______
+
+qa_chain = <function get_qa_chain.<locals>.qa_with_sources at 0x00000278501056C0>
+question = FactualQuestion(question='Which company did Nortal acquire in 2024?', expected_answer='3DOT', match_type='contains')
+
+    @pytest.mark.parametrize("question", QUESTIONS, ids=[q.question for q in QUESTIONS])
+    def test_factual_question(qa_chain, question: FactualQuestion):
+        """
+        Test a factual question against the RAG system.
+        """
+        result = qa_chain(question.question)
+        answer = result.get("answer", "")
+    
+        assert answer, "RAG returned empty answer"
+    
+        if question.match_type == "contains":
+>           assert question.expected_answer.lower() in answer.lower(), \
+E           AssertionError: Expected '3DOT' in answer: Nortal acquired Nearsure, a U.S.-based technology solutions company, in 2024.
+E           assert '3dot' in 'nortal acquired nearsure, a u.s.-based technology solutions company, in 2024.'
+E            +  where '3dot' = <built-in method lower of str object at 0x000002784FA725F0>()
+E            +    where <built-in method lower of str object at 0x000002784FA725F0> = '3DOT'.lower
+E            +      where '3DOT' = FactualQuestion(question='Which company did Nortal acquire in 2024?', expected_answer='3DOT', match_type='contains').expected_answer
+E            +  and   'nortal acquired nearsure, a u.s.-based technology solutions company, in 2024.' = <built-in method lower of str object at 0x000002785059EFB0>()
+E            +    where <built-in method lower of str object at 0x000002785059EFB0> = 'Nortal acquired Nearsure, a U.S.-based technology solutions company, in 2024.'.lower
+
+tests\evaluation\test_factual.py:38: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/evaluation/test_factual.py::test_factual_question[How many experts does Nortal have?]
+FAILED tests/evaluation/test_factual.py::test_factual_question[Which company did Nortal acquire in 2024?]
+======================== 2 failed, 6 passed in 13.95s =========================
