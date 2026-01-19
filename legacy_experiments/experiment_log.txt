@@ -1,0 +1,5 @@
+2026-01-19T15:17:12.985389 | Name: baseline | Chunk: 1000/200 | Factual: ======================== 2 failed, 6 passed in 13.95s =========================
+2026-01-19T15:18:58.777549 | Name: small_chunk | Chunk: 500/50 | Factual: ======================== 2 failed, 6 passed in 11.53s =========================
+2026-01-19T15:20:44.014313 | Name: large_chunk | Chunk: 2000/400 | Factual: ======================== 2 failed, 6 passed in 11.80s =========================
+2026-01-19T17:42:49.204353 | Name: langsmith_test | Chunk: 1000/200 | Factual: ======================== 3 failed, 5 passed in 16.20s =========================
+2026-01-19T18:40:17.017213 | Name: test_ls_integration | Chunk: 1000/200 | Factual: Logged to LangSmith

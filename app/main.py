@@ -1,6 +1,12 @@
 
 import streamlit as st
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+# Set LangSmith project for Streamlit
+os.environ["LANGCHAIN_PROJECT"] = "nortal-rag-streamlit"
+
 from rag import get_qa_chain
 from scraper import NortalScraper
 from ingest import ingest_data

@@ -10,3 +10,6 @@ __pycache__/
 *~
 .vscode/
 .idea/
+
+# Data
+data/chroma_db/

@@ -1,0 +1,6 @@
+Initializing RAG Chain...
+Starting evaluation on dataset 'Nortal RAG Factual'...
+View the evaluation results for experiment: 'nortal-rag-test_ls_integration-acc3a21e' at:
+https://smith.langchain.com/o/05bea788-b744-53cc-a55e-8f72f5bd94bb/datasets/122a7256-aaa1-4fdb-8e41-c01a148b8bc7/compare?selectedSessions=207c2512-bc33-408c-8df9-6f1c07d6c3ea
+
+

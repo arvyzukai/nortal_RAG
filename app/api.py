@@ -4,6 +4,10 @@ from typing import List, Optional
 from app.rag import get_qa_chain
 import uvicorn
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+os.environ["LANGCHAIN_PROJECT"] = "nortal-rag-api"
 
 app = FastAPI(title="Nortal RAG API")
 
