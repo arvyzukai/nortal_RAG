@@ -9,7 +9,7 @@ A local Retrieval-Augmented Generation (RAG) platform that scrapes `nortal.com`,
 
 ### Prerequisites
 - Python 3.11+
-- Docker & Docker Compose (for containerized deployment)
+- Docker & Docker Compose
 - OpenAI API Key
 
 ### Local Development Setup
@@ -33,42 +33,35 @@ A local Retrieval-Augmented Generation (RAG) platform that scrapes `nortal.com`,
    # Edit .env and set OPENAI_API_KEY=sk-...
    ```
 
-4. **Run the Scraper:**
+4. **Initialize Data (Optional if using included DB):**
    ```bash
    python app/scraper.py
-   ```
-   This will scrape nortal.com and save content to `data/scraped_data.json`.
-
-5. **Ingest Data into Vector Database:**
-   ```bash
    python app/ingest.py
    ```
-   This processes the scraped content and creates embeddings in `data/chroma_db`.
 
-6. **Launch Streamlit App:**
-   ```bash
-   streamlit run app/main.py
-   ```
-   Access the app at [http://localhost:8501](http://localhost:8501).
+5. **Launch Services:**
+   - **Frontend (Streamlit):** `streamlit run app/main.py`
+   - **Backend (FastAPI):** `uvicorn app.api:app --reload`
 
 ---
 
 ## 🐳 Docker Deployment
 
-**Run the entire platform with a single command:**
+**Run the entire platform (Frontend, API, and Selenium) with a single command:**
 
 ```bash
 docker-compose up --build
 ```
 
-**Initial Data Loading** (one-time setup):
-```bash
-# After containers start, open a new terminal:
-docker-compose exec app python app/scraper.py
-docker-compose exec app python app/ingest.py
-```
+**Services included:**
+- **Streamlit UI:** [http://localhost:8501](http://localhost:8501)
+- **FastAPI Backend:** [http://localhost:8000](http://localhost:8000)
+- **Selenium Standalone:** Handles JavaScript rendering for the scraper.
 
-Access the app at [http://localhost:8501](http://localhost:8501).
+**Verify API Health:**
+```bash
+curl http://localhost:8000/health
+```
 
 ---
 
@@ -113,7 +106,12 @@ This ensures the vector DB only indexes meaningful content, not boilerplate HTML
 - **Consistency:** Same ecosystem as our LLM (GPT-4o), ensuring embedding-generation alignment.
 - **Cost-Effective:** Affordable for moderate-scale indexing.
 
-**Alternative Considered:** Could use open-source embeddings (e.g., `sentence-transformers`) for fully local deployment, but OpenAI provides superior quality for this POC.
+### 4. API Layer: Why FastAPI?
+
+- **Performance:** Asynchronous support allows handling multiple requests efficiently.
+- **Validation**: Pydantic models ensure data integrity for requests and responses.
+- **Documentation**: Automatic OpenAPI (Swagger) documentation available at `/docs`.
+- **Integration**: Easily consumed by any frontend or external service, moving beyond manual Streamlit interactions.
 
 ---
 
@@ -126,8 +124,9 @@ This ensures the vector DB only indexes meaningful content, not boilerplate HTML
 | **Vector Store** | ChromaDB | Local, persistent, easy setup |
 | **Embeddings** | OpenAI Embeddings | High quality, consistent with LLM |
 | **LLM** | GPT-4o | Latest OpenAI model, strong reasoning |
+| **Backend API** | FastAPI + Uvicorn | High-performance, asynchronous, typed API |
 | **Frontend** | Streamlit | Rapid prototyping, built-in chat UI |
-| **Orchestration** | Docker Compose | Single-command deployment |
+| **Orchestration** | Docker Compose | Multi-service orchestration (UI, API, Selenium) |
 
 ---
 
@@ -140,12 +139,14 @@ nortal_rag/
 │   ├── scraper.py          # Selenium scraper with BFS
 │   ├── ingest.py           # Vector DB indexing
 │   ├── rag.py              # LangChain retrieval chain
+│   ├── api.py              # FastAPI backend endpoints
 │   └── main.py             # Streamlit UI
 ├── data/
 │   ├── scraped_data.json   # Scraped content cache
 │   └── chroma_db/          # Vector store persistence
+├── tests/                  # API and integration tests
+├── verify_api.py           # Quick API verification script
 ├── .env                    # API keys (not committed)
-├── .env.example            # Template
 ├── .gitignore
 ├── requirements.txt
 ├── Dockerfile
@@ -165,7 +166,9 @@ nortal_rag/
    - Retrieved context + query are sent to GPT-4o
    - GPT-4o generates a concise answer
    - Sources are displayed with links
-4. **UI:** Streamlit provides a chat interface with message history and expandable source citations.
+4. **Interfaces:**
+   - **Streamlit:** Provides a user-friendly chat interface with message history and source citations.
+   - **FastAPI:** Provides a programmatic `/chat` endpoint for integration with other systems.
 
 ---
 
