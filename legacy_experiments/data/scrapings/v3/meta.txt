@@ -1,0 +1,6 @@
+date: 2026-01-20
+max_pages: 200
+depth: 3
+pdf_enabled: true
+chunk_size: 1000
+chunk_overlap: 200

@@ -9,6 +9,30 @@
 
 ## Experiments
 
+### Exp 3 — PDF & Expanded Coverage (2026-01-20)
+| Parameter | Value |
+|-----------|-------|
+| max_pages | 200 |
+| max_depth | 3 |
+| chunk_size | 1000 |
+| chunk_overlap | 200 |
+| **PDF scraping** | **Enabled** |
+
+**Results**:
+- **Factual Correctness**: 0.38 (8 samples)
+- **Abstract Quality**: 0.77 (6 samples)
+- **Scraped**: 207 items (200 HTML, 7 PDF)
+- **Chunks**: 3473
+- **PDFs found**: 24 URLs discovered, 7 processed
+
+**Notes**:
+- **Regression detected**: Performance dropped compared to Exp 2 (Factual 0.75 -> 0.38).
+- Larger dataset (3473 chunks vs 1603) likely diluted retrieval quality.
+- PDF content might be introducing noise or formatting issues.
+- `max_depth` of 3 reached 200 pages quickly.
+
+---
+
 ### Exp 2 — Extended Coverage (2026-01-20)  
 | Parameter | Value |
 |-----------|-------|
