@@ -1,0 +1,11 @@
+# Dataset Metadata - Experiment 1 (Baseline)
+
+Crawling Date: 2025-01-16
+Parameters:
+  - max_pages: 50
+  - max_depth: 2
+  - start_url: https://nortal.com/
+
+Notes:
+  - This is the original baseline dataset before running experiment #2
+  - File: scraped_data_exp1.json
