@@ -111,7 +111,7 @@ Detailed architectural decisions and implementation notes can be found in [ARCHI
    - **FastAPI:** Provides a programmatic `/chat` endpoint for integration with other systems.
 
 > [!NOTE]
-> The current implementation is a Proof of Concept (POC). It provides **chat history** (context within the current session) but does not have **persistent memory** across different sessions.
+> The current implementation is a Proof of Concept (POC). It displays **chat history** (Question-Answer pairs) in the streamlit UI, but the RAG pipeline does not maintain **LangChain memory** (context awareness) between messages. Each query is processed independently.
 
 ---
 
