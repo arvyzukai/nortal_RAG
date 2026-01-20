@@ -3,6 +3,7 @@ import json
 import os
 import logging
 import re
+import requests
 from collections import deque
 from urllib.parse import urlparse, urljoin
 from selenium import webdriver
@@ -11,18 +12,30 @@ from selenium.webdriver.chrome.service import Service
 
 from bs4 import BeautifulSoup
 
+try:
+    import fitz  # PyMuPDF
+    PDF_SUPPORT = True
+except ImportError:
+    PDF_SUPPORT = False
+    logging.warning("PyMuPDF not installed. PDF scraping will be disabled.")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+
 class NortalScraper:
-    def __init__(self, start_url="https://nortal.com/", max_pages=10, max_depth=2, output_dir="data"):
+    def __init__(self, start_url="https://nortal.com/", max_pages=10, max_depth=2, 
+                 output_dir="data", pdf_output_dir="data/scraped_pdfs", scrape_pdfs=True):
         self.start_url = start_url
         self.max_pages = max_pages
         self.max_depth = max_depth
         self.output_dir = output_dir
+        self.pdf_output_dir = pdf_output_dir
+        self.scrape_pdfs = scrape_pdfs and PDF_SUPPORT
         self.visited = set()
         self.queue = deque([(start_url, 0)])  # (url, depth)
         self.data = []
+        self.pdf_urls = set()  # Track discovered PDF URLs
         
         self.driver = None
 
@@ -52,8 +65,17 @@ class NortalScraper:
                 raise
 
     def is_valid_url(self, url):
+        """Check if URL is a valid nortal.com URL."""
         parsed = urlparse(url)
-        return parsed.netloc == "nortal.com" and not "#" in url and not url.lower().endswith(('.pdf', '.jpg', '.png', '.css', '.js'))
+        return parsed.netloc == "nortal.com" and "#" not in url
+
+    def is_html_url(self, url):
+        """Check if URL is an HTML page (not a binary asset)."""
+        return not url.lower().endswith(('.jpg', '.png', '.css', '.js', '.gif', '.ico', '.svg', '.woff', '.woff2'))
+
+    def is_pdf_url(self, url):
+        """Check if URL is a PDF file."""
+        return url.lower().endswith('.pdf')
 
     def clean_text(self, text):
         """Remove extra whitespace and basic cleanup."""
@@ -87,6 +109,90 @@ class NortalScraper:
             
         return self.clean_text(text)
 
+    def download_pdf(self, url):
+        """
+        Download PDF from URL and save to disk.
+        
+        Returns:
+            str: Path to downloaded PDF file, or None if download failed.
+        """
+        try:
+            # Create PDF output directory if needed
+            os.makedirs(self.pdf_output_dir, exist_ok=True)
+            
+            # Generate filename from URL
+            parsed = urlparse(url)
+            filename = os.path.basename(parsed.path)
+            if not filename.endswith('.pdf'):
+                filename = f"{hash(url)}.pdf"
+            
+            # Sanitize filename
+            filename = re.sub(r'[<>:"/\\|?*]', '_', filename)
+            pdf_path = os.path.join(self.pdf_output_dir, filename)
+            
+            # Skip if already downloaded
+            if os.path.exists(pdf_path):
+                logging.info(f"PDF already exists: {pdf_path}")
+                return pdf_path
+            
+            logging.info(f"Downloading PDF: {url}")
+            response = requests.get(url, timeout=30, headers={
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            })
+            response.raise_for_status()
+            
+            # Verify it's actually a PDF
+            content_type = response.headers.get('content-type', '')
+            if 'pdf' not in content_type.lower() and not response.content[:4] == b'%PDF':
+                logging.warning(f"URL does not return PDF content: {url}")
+                return None
+            
+            with open(pdf_path, 'wb') as f:
+                f.write(response.content)
+            
+            logging.info(f"Downloaded PDF to: {pdf_path}")
+            return pdf_path
+            
+        except Exception as e:
+            logging.error(f"Failed to download PDF {url}: {e}")
+            return None
+
+    def extract_pdf_content(self, pdf_path):
+        """
+        Extract text content from a PDF file using PyMuPDF.
+        
+        Returns:
+            tuple: (title, content) extracted from the PDF.
+        """
+        if not PDF_SUPPORT:
+            return None, ""
+        
+        try:
+            doc = fitz.open(pdf_path)
+            
+            # Try to get title from metadata or first heading
+            title = doc.metadata.get('title', '')
+            if not title:
+                # Use filename as fallback
+                title = os.path.splitext(os.path.basename(pdf_path))[0]
+                title = title.replace('_', ' ').replace('-', ' ').title()
+            
+            # Extract text from all pages
+            text_parts = []
+            for page in doc:
+                text = page.get_text()
+                if text:
+                    text_parts.append(text)
+            
+            doc.close()
+            
+            content = self.clean_text(' '.join(text_parts))
+            return title, content
+            
+        except Exception as e:
+            logging.error(f"Failed to extract content from PDF {pdf_path}: {e}")
+            return None, ""
+
     def scrape(self):
         if not self.driver:
             self._init_driver()
@@ -96,14 +202,27 @@ class NortalScraper:
             while self.queue and pages_scraped < self.max_pages:
                 current_url, depth = self.queue.popleft()
                 
-                # Normalize URL (strip trailing slash)
-                current_url = current_url.rstrip('/')
+                # Normalize URL (strip trailing slash for HTML pages)
+                if not self.is_pdf_url(current_url):
+                    current_url = current_url.rstrip('/')
                 
                 if current_url in self.visited:
                     continue
                 
                 # Check depth early
                 if depth > self.max_depth:
+                    continue
+                
+                # Handle PDF URLs separately
+                if self.is_pdf_url(current_url):
+                    if self.scrape_pdfs:
+                        self._process_pdf(current_url)
+                    self.visited.add(current_url)
+                    continue
+                
+                # Skip non-HTML URLs
+                if not self.is_html_url(current_url):
+                    self.visited.add(current_url)
                     continue
                 
                 logging.info(f"Scraping: {current_url} (Depth: {depth})")
@@ -123,7 +242,8 @@ class NortalScraper:
                         self.data.append({
                             "url": current_url,
                             "title": title,
-                            "content": content
+                            "content": content,
+                            "source_type": "html"
                         })
                         pages_scraped += 1
                     else:
@@ -136,10 +256,19 @@ class NortalScraper:
                         links_found = 0
                         for link in soup.find_all('a', href=True):
                             href = link['href']
-                            full_url = urljoin(current_url, href).rstrip('/')
+                            full_url = urljoin(current_url, href)
                             
-                            if self.is_valid_url(full_url) and full_url not in self.visited:
-                                self.queue.append((full_url, depth + 1))
+                            # Handle PDF links differently
+                            if self.is_pdf_url(full_url):
+                                full_url_normalized = full_url  # Don't strip trailing slash for PDFs
+                            else:
+                                full_url_normalized = full_url.rstrip('/')
+                            
+                            if self.is_valid_url(full_url_normalized) and full_url_normalized not in self.visited:
+                                # Add PDF URLs to a separate set for tracking
+                                if self.is_pdf_url(full_url_normalized):
+                                    self.pdf_urls.add(full_url_normalized)
+                                self.queue.append((full_url_normalized, depth + 1))
                                 links_found += 1
                         logging.info(f"Found {links_found} new links on {current_url}")
                                 
@@ -150,14 +279,45 @@ class NortalScraper:
             if self.driver:
                 self.driver.quit()
         
+        # Log PDF discovery summary
+        if self.pdf_urls:
+            logging.info(f"Discovered {len(self.pdf_urls)} PDF URLs during crawl")
+        
         self.save_data()
+
+    def _process_pdf(self, url):
+        """Process a single PDF URL: download and extract content."""
+        logging.info(f"Processing PDF: {url}")
+        
+        pdf_path = self.download_pdf(url)
+        if not pdf_path:
+            return
+        
+        title, content = self.extract_pdf_content(pdf_path)
+        
+        if content and len(content) > 100:
+            self.data.append({
+                "url": url,
+                "title": title or os.path.basename(pdf_path),
+                "content": content,
+                "source_type": "pdf"
+            })
+            logging.info(f"Successfully extracted content from PDF: {title}")
+        else:
+            logging.warning(f"PDF has insufficient content: {url}")
 
     def save_data(self):
         os.makedirs(self.output_dir, exist_ok=True)
         output_path = os.path.join(self.output_dir, "scraped_data.json")
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(self.data, f, ensure_ascii=False, indent=2)
-        logging.info(f"Scraping complete. Saved {len(self.data)} pages to {output_path}")
+        
+        # Count by source type
+        html_count = sum(1 for d in self.data if d.get('source_type') == 'html')
+        pdf_count = sum(1 for d in self.data if d.get('source_type') == 'pdf')
+        
+        logging.info(f"Scraping complete. Saved {len(self.data)} items ({html_count} HTML, {pdf_count} PDF) to {output_path}")
+
 
 if __name__ == "__main__":
     # Production run with more comprehensive scraping

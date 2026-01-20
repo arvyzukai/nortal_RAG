@@ -28,7 +28,11 @@ def ingest_data(json_path="data/scraped_data.json", chunk_size=1000, chunk_overl
         # Metadata is crucial for citations
         doc = Document(
             page_content=entry.get("content", ""),
-            metadata={"source": entry.get("url", ""), "title": entry.get("title", "")}
+            metadata={
+                "source": entry.get("url", ""),
+                "title": entry.get("title", ""),
+                "source_type": entry.get("source_type", "html")  # Track content origin
+            }
         )
         documents.append(doc)
 

@@ -13,3 +13,7 @@ uvicorn
 pydantic
 pytest
 langsmith
+
+# PDF scraping
+PyMuPDF
+requests

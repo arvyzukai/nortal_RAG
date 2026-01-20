@@ -30,3 +30,15 @@ def test_chat_ai_hack():
     data = response.json()
     assert "answer" in data
 
+
+def test_chat_scada_scenario():
+    """Test the chat endpoint with a SCADA question (expected from PDF content)."""
+    payload = {"question": "What is a SCADA sabotage scenario?"}
+    response = client.post("/chat", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert "answer" in data
+    # Relaxed constraint: just verify we get a meaningful answer
+    # (The RAG system may phrase the response differently)
+    assert isinstance(data["answer"], str)
+    assert len(data["answer"]) > 10  # Should have some content
