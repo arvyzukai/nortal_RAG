@@ -1,0 +1,35 @@
+{
+  "total_html": 200,
+  "total_pdf": 7,
+  "sampled_html": 20,
+  "sampled_pdf": 5,
+  "html_urls": [
+    "https://nortal.com",
+    "https://nortal.com/about/nortal25",
+    "https://nortal.com/insights/government-efficiency-in-the-age-of-ai",
+    "https://nortal.com/ai-hack",
+    "https://nortal.com/industries/public-sector",
+    "https://nortal.com/industries/healthcare",
+    "https://nortal.com/archive/industries/aerospace-and-defence",
+    "https://nortal.com/industries/industry-sector",
+    "https://nortal.com/industries/energy-and-resources",
+    "https://nortal.com/industries/retail",
+    "https://nortal.com/industries/telecommunications-and-media",
+    "https://nortal.com/industries/financial-services",
+    "https://nortal.com/insights/government-resilience-in-the-digital-age",
+    "https://nortal.com/insights/from-docks-to-data-charting-a-course-for-cyber-resilience-in-the-smart-port-era",
+    "https://nortal.com/insights/embedding-resilience-becoming-cyber-resilient-through-accepting-the-threat",
+    "https://nortal.com/insights/why-digital-sovereignty-matters-and-how-x-road-makes-it-happen",
+    "https://nortal.com/insights/creating-trust-digital-government",
+    "https://nortal.com/insights/enhancing-cybersecurity-for-the-uk-ministry-of-defence",
+    "https://nortal.com/uk-ai-maturity",
+    "https://nortal.com/platforms/microsoft"
+  ],
+  "pdf_urls": [
+    "https://nortal.com/hubfs/Nortal_Government_efficiency_WP-digital-1.pdf",
+    "https://nortal.com/hubfs/gov_resilience_web.pdf",
+    "https://nortal.com/hubfs/Whitepapers/MaritimeCyber_WP.pdf",
+    "https://nortal.com/hubfs/Embedding_resiliencePDF.pdf",
+    "https://nortal.com/hubfs/cyberresilience-spread.pdf"
+  ]
+}

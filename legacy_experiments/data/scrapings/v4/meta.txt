@@ -1,0 +1,5 @@
+date: 2026-01-20
+source: llm_digested_data.json
+sample: 20 HTML + 5 PDF pages
+digestion_model: gpt-4o
+chunks_created: 171

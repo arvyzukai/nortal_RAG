@@ -2,12 +2,33 @@
 
 > Tracking experiments to improve Nortal RAG system performance.
 
-## Current Best: Experiment 2
-- **Factual Correctness**: 0.75 | **Abstract Quality**: 0.90
+## Current Best: Experiment 4
+- **Factual Correctness**: 0.88 | **Abstract Quality**: 0.60
 
 ---
 
 ## Experiments
+
+### Exp 4 — LLM Digestion (2026-01-20)
+| Parameter | Value |
+|-----------|-------|
+| Source | **LLM Digested** (GPT-4o) |
+| Sample | 25 pages (20 HTML + 5 PDF) |
+| Chunks | 890 (from 171 digested) |
+| Chunk Size | 1000 |
+
+**Results**:
+- **Factual Correctness**: **0.88** (7/8) ✅
+- **Abstract Quality**: 0.60 (6 samples)
+
+**Notes**:
+- **Significant Improvement**: +13% factual accuracy vs Exp 2 baseline (0.75).
+- **Method**: Pre-processed content with GPT-4o to extract Summary + Key Facts + Topics.
+- **Rich Semantics**: Structured summaries provided better retrieval signals than raw chunks.
+
+**LangSmith**: [Factual](https://smith.langchain.com/o/05bea788-b744-53cc-a55e-8f72f5bd94bb/datasets/4274bae4-4b4e-47b8-beff-875df22f77f0/compare?selectedSessions=5f1bb727-1bb8-4496-b00d-f0da9b83dfa8) | [Abstract](https://smith.langchain.com/o/05bea788-b744-53cc-a55e-8f72f5bd94bb/datasets/8b3f3d64-f35f-4cc1-b2ac-4977c00eb9b1/compare?selectedSessions=522d8601-b642-4e77-8b6d-6c4f36bfb377)
+
+---
 
 ### Exp 3 — PDF & Expanded Coverage (2026-01-20)
 | Parameter | Value |

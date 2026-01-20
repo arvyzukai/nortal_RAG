@@ -1,0 +1,14 @@
+=== Factual Evaluation Results ===
+Experiment: digested_v1-factual
+Date: 2026-01-20
+Data: llm_digested_data.json (v4)
+
+Questions: 8
+Passed: 7
+Failed: 1
+Score: 88%
+
+Comparison to baseline (6/8 = 75%): +13% improvement
+
+LangSmith trace:
+https://smith.langchain.com/o/05bea788-b744-53cc-a55e-8f72f5bd94bb/datasets/4274bae4-4b4e-47b8-beff-875df22f77f0/compare?selectedSessions=5f1bb727-1bb8-4496-b00d-f0da9b83dfa8

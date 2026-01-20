@@ -1,0 +1,10 @@
+=== Abstract Evaluation Results ===
+Experiment: digested_v1-abstract
+Date: 2026-01-20
+Data: llm_digested_data.json (v4)
+
+Questions: 6
+Average Quality Score: 0.60 (scale 0-1)
+
+LangSmith trace:
+https://smith.langchain.com/o/05bea788-b744-53cc-a55e-8f72f5bd94bb/datasets/8b3f3d64-f35f-4cc1-b2ac-4977c00eb9b1/compare?selectedSessions=522d8601-b642-4e77-8b6d-6c4f36bfb377

@@ -14,9 +14,11 @@ def main():
     parser.add_argument("--name", required=True, help="Experiment Name (e.g., 'baseline', 'chunk_500')")
     parser.add_argument("--chunk-size", type=int, default=1000)
     parser.add_argument("--chunk-overlap", type=int, default=200)
+    parser.add_argument("--json-path", default="data/scraped_data.json", help="Path to input JSON data")
     args = parser.parse_args()
 
     print(f"=== Starting Experiment: {args.name} ===")
+    print(f"Data source: {args.json_path}")
     
     # Set LangSmith Project Name for this session (globally for this process)
     # This groups traces under this project
@@ -26,6 +28,7 @@ def main():
     # 1. Ingest
     print("\n[Step 1] Ingesting Data...")
     ingest_data(
+        json_path=args.json_path,
         chunk_size=args.chunk_size, 
         chunk_overlap=args.chunk_overlap
     )

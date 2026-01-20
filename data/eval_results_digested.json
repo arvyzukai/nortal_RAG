@@ -1,0 +1,60 @@
+{
+  "experiment": "llm_digested_sample_v1",
+  "data_source": "llm_digested_data.json",
+  "sample": {
+    "html": 20,
+    "pdf": 5
+  },
+  "score": "6/8",
+  "accuracy": 0.75,
+  "results": [
+    {
+      "question": "How many offices does Nortal have worldwide?",
+      "expected": "30",
+      "answer": "Nortal has 30 offices worldwide.",
+      "passed": true
+    },
+    {
+      "question": "How many experts does Nortal have?",
+      "expected": "2700",
+      "answer": "Nortal employs over 2700 experts globally.",
+      "passed": true
+    },
+    {
+      "question": "When was Nortal founded?",
+      "expected": "25 years ago",
+      "answer": "Nortal was founded 25 years ago in Estonia.",
+      "passed": true
+    },
+    {
+      "question": "Which company did Nortal acquire in 2024?",
+      "expected": "3DOT",
+      "answer": "I don't know.",
+      "passed": false
+    },
+    {
+      "question": "In which year did Nortal acquire Dev9?",
+      "expected": "2018",
+      "answer": "Nortal acquired Dev9 in 2018.",
+      "passed": true
+    },
+    {
+      "question": "What is the name of the data exchange layer Estonia uses?",
+      "expected": "X-Road",
+      "answer": "The name of the data exchange layer Estonia uses is X-Road.",
+      "passed": true
+    },
+    {
+      "question": "Who is the founder and CEO of Nortal?",
+      "expected": "Priit Alam\u00c3\u00a4e",
+      "answer": "The founder and CEO of Nortal is Priit Alam\u00e4e.",
+      "passed": false
+    },
+    {
+      "question": "In what year did Nortal establish a delivery centre in Serbia?",
+      "expected": "2006",
+      "answer": "Nortal established a delivery centre in Serbia in 2006.",
+      "passed": true
+    }
+  ]
+}
