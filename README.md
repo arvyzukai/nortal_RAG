@@ -76,95 +76,23 @@ Ensure the API server is running (`uvicorn app.api:app`), then run:
 
 ---
 
-## 📋 Assignment Questions & Architectural Justifications
+## 📋 Architecture
 
-### 1. Framework Choice: Why LangChain?
-
-I chose **LangChain** over LlamaIndex because:
-- **Simplicity for RAG**: LangChain provides a straightforward, composable approach using LCEL (LangChain Expression Language) for building retrieval pipelines.
-- **Flexibility**: Easier to customize retrieval logic, integrate custom prompts, and swap components (e.g., vector stores, LLMs).
-- **Ecosystem**: Seamless integration with ChromaDB, OpenAI, and Streamlit.
-- **Production-Ready**: Battle-tested in production environments with extensive community support.
-
-**Implementation Details:**
-- Used LCEL to build a retrieval chain that combines document retrieval with GPT-4o for answer generation.
-- Custom `format_docs` function ensures retrieved context is properly formatted for the LLM.
-- Wrapped the chain in `qa_with_sources()` to return both answers and source citations.
-
-### 2. Scraping Logic: How does BFS handle rate limiting and deep-nesting?
-
-**Selenium with BFS Implementation:**
-- **Why Selenium?** Nortal.com is a modern, JavaScript-heavy site. Selenium renders the page fully, ensuring we capture dynamically loaded content that static scrapers might miss.
-- **BFS Queue:** Implements breadth-first traversal using `collections.deque`. Each URL is paired with its depth level `(url, depth)`.
-- **Rate Limiting:** Simple `time.sleep(2)` between requests to avoid overwhelming the server. In production, this could use exponential backoff or respect `robots.txt`.
-- **Depth Control:** `max_depth=2` parameter limits how deep we crawl. This prevents infinite loops and focuses on high-value pages.
-- **Content Cleaning:** Custom `extract_content()` function removes:
-  - Navigation, headers, footers, and forms
-  - Cookie banners and popups (via regex on class names)
-  - JavaScript and style tags
-  
-This ensures the vector DB only indexes meaningful content, not boilerplate HTML.
-
-### 3. Vector Ops: Why ChromaDB and OpenAI Embeddings?
-
-**ChromaDB:**
-- **Local-First Design:** Runs embedded or as a lightweight server - perfect for "local RAG" requirement.
-- **Persistence:** Simple directory-based persistence (`data/chroma_db`) - no complex DB setup.
-- **Performance:** Fast similarity search with HNSW indexing.
-
-**OpenAI Embeddings (`text-embedding-3-small`):**
-- **Quality:** State-of-the-art semantic understanding for retrieval tasks.
-- **Consistency:** Same ecosystem as our LLM (GPT-4o), ensuring embedding-generation alignment.
-- **Cost-Effective:** Affordable for moderate-scale indexing.
-
-### 4. API Layer: Why FastAPI?
-
-- **Performance:** Asynchronous support allows handling multiple requests efficiently.
-- **Validation**: Pydantic models ensure data integrity for requests and responses.
-- **Documentation**: Automatic OpenAPI (Swagger) documentation available at `/docs`.
-- **Integration**: Easily consumed by any frontend or external service, moving beyond manual Streamlit interactions.
-
----
+Detailed architectural decisions and implementation notes can be found in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## 🛠 Tech Stack
 
 | Component | Technology | Justification |
 |-----------|-----------|---------------|
-| **Web Scraping** | Selenium + BeautifulSoup | Handles JavaScript-heavy sites, extracts clean text |
+| **Web Scraping** | Selenium + BeautifulSoup + PyMuPDF | Handles JavaScript-heavy sites & PDF documents |
 | **RAG Framework** | LangChain (LCEL) | Composable, flexible, production-ready |
 | **Vector Store** | ChromaDB | Local, persistent, easy setup |
 | **Embeddings** | OpenAI Embeddings | High quality, consistent with LLM |
 | **LLM** | GPT-4o | Latest OpenAI model, strong reasoning |
 | **Backend API** | FastAPI + Uvicorn | High-performance, asynchronous, typed API |
 | **Frontend** | Streamlit | Rapid prototyping, built-in chat UI |
+| **Observability** | LangSmith | Tracing, debugging, and monitoring RAG chains |
 | **Orchestration** | Docker Compose | Multi-service orchestration (UI, API, Selenium) |
-
----
-
-## 📂 Project Structure
-
-```
-nortal_rag/
-├── app/
-│   ├── __init__.py         # Package marker
-│   ├── api.py              # FastAPI backend endpoints
-│   ├── ingest.py           # Vector DB indexing
-│   ├── main.py             # Streamlit UI
-│   ├── rag.py              # LangChain retrieval chain
-│   └── scraper.py          # Selenium scraper with BFS
-├── data/
-│   ├── chroma_db/          # Vector store persistence
-│   └── scraped_data.json   # Scraped content cache
-├── tests/                  # API and RAG integration tests (pytest)
-│   ├── test_api.py         # FastAPI endpoint tests
-│   └── test_rag.py         # RAG pipeline integration tests
-├── .env.example            # Environment template
-├── .gitignore
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
-```
 
 ---
 
@@ -182,6 +110,9 @@ nortal_rag/
    - **Streamlit:** Provides a user-friendly chat interface with message history and source citations.
    - **FastAPI:** Provides a programmatic `/chat` endpoint for integration with other systems.
 
+> [!NOTE]
+> The current implementation is a Proof of Concept (POC). It provides **chat history** (context within the current session) but does not have **persistent memory** across different sessions.
+
 ---
 
 ## 📊 Sample Queries
@@ -193,40 +124,15 @@ nortal_rag/
 
 ---
 
-## 🎯 Code Ownership & Understanding
-
-All code in this repository was written with full understanding:
-- **Scraper:** Custom BFS implementation with depth control and content cleaning.
-- **RAG Pipeline:** LCEL-based chain composition, avoiding deprecated `RetrievalQA`.
-- **Deployment:** Multi-service Docker Compose with Selenium standalone container.
-
-Key design decisions were made to prioritize **simplicity**, **maintainability**, and **AI engineering best practices**.
-
----
-
-## 🔧 Configuration
-
-### Scraper Parameters (in `app/scraper.py`)
-```python
-max_pages=10    # Total pages to scrape
-max_depth=2     # BFS depth limit
-```
-
-### RAG Parameters (in `app/rag.py`)
-```python
-search_kwargs={"k": 3}  # Number of documents to retrieve
-temperature=0           # Deterministic responses
-```
-
----
-
 ## 📝 Future Enhancements
 
-- **Async Scraping:** Use `aiohttp` + async Selenium for faster crawling.
-- **Incremental Updates:** Detect changed pages and re-index only deltas.
-- **Production DB:** Migrate to Weaviate or Pinecone for scale.
-- **Auth & Multi-Tenancy:** Add user authentication and isolated vector stores.
-- **Evaluation:** Implement RAG evaluation metrics (faithfulness, relevance).
+The development roadmap focuses on iterative improvements driven by experimental data rather than speculative feature additions.
+
+-   **Chat Memory:** Implement persistent conversational memory to allow follow-up questions and context retention across messages.
+-   **LangChain Tool Integration:** Experiment with giving the LLM access to specific tools (e.g., calculator, search API) to handle queries that require external computation or real-time data.
+-   **Agentic Workflows:** Investigate agentic orchestration to handle complex multi-step reasoning. This includes implementing guardrails for ethical considerations and preventing jailbreaking.
+-   **Human Handoff:** additions of a fallback mechanism to route the conversation to a human operator after a configurable number of interactions or if satisfaction metrics drop.
+-   **Iterative Optimization:** Continuous refinement of chunking strategies, embedding models, and retrieval parameters based on quantitative evaluation results.
 
 ---
 
